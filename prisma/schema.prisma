@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum SCHEDULE_TIME {
+  PENDING
+  CANCELED
+  EXCECUTED
+}
+
+enum FILE_STATUS {
+  UPLOADED
+  DELETED
+}
+
+model file {
+  id       String      @id @default(cuid())
+  filename String      @unique
+  status   FILE_STATUS
+  schedule schedule[]
+}
+
+model schedule {
+  id           String        @id @default(cuid())
+  fileId       String
+  ScheduleName String        @unique
+  time         DateTime
+  status       SCHEDULE_TIME
+  file         file          @relation(fields: [fileId], references: [id])
+
+  @@index([fileId])
+}
